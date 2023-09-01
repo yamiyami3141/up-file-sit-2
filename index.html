@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ja">
+    
+<head>
+    <meta charset="utf-8">
+    <title>up-file-sit</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" sizes="32x32" href="#">
+    <link href="../dest/style.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.8/clipboard.min.js"></script>
+    <style>
+        *,
+        *:before,
+        *:after {
+        -webkit-box-sizing: inherit;
+        box-sizing: inherit;
+        }
+
+        html {
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+        font-size: 62.5%;/*rem算出をしやすくするために*/
+        }
+
+        .btn,
+        a.btn,
+        button.btn {
+        font-weight: 700;
+        line-height: 1.5;
+        position: relative;
+        display: inline-block;
+        padding: 1rem 4rem;
+        cursor: pointer;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        -webkit-transition: all 0.3s;
+        transition: all 0.3s;
+        text-align: center;
+        vertical-align: middle;
+        text-decoration: none;
+        letter-spacing: 0.1em;
+        color: #212529;
+        border-radius: 0.5rem;
+        }
+        body{
+            min-height: 100vh;
+        }
+        #ddarea{
+            width:80%;
+            height:150px;
+            border:1px dotted #888;
+            margin: 1em auto;
+        }
+        #ddarea.ddefect{
+            border:1px solid #000;
+        }
+        #txtarea{
+            display: inline;
+            color: #0cf;
+            background: (90deg, rgba(2,0,36, 1) 0%, rgba(9,9,121, 1) 35%, rgba(0,212,255, 1) 100%);
+            padding: 0 40px;
+            box-decoration-break: clone;
+            border-radius: 25px;
+            padding:5px;
+            width: 90%;
+            height: 150px;
+            overflow: auto;
+            margin: 1em auto;
+        }
+        .txtareawrap{
+            text-align:center;
+            margin-bottom:1em;
+        }
+        .gg-file-add {
+            margin: 0 auto;
+            background:
+                linear-gradient(to bottom,
+                    currentColor 5px,transparent 0)
+                    no-repeat 2px 9px/6px 2px;
+            box-sizing: border-box;
+            position: relative;
+            display: block;
+            transform: scale(var(--ggs,1));
+            width: clamp(15px, 5vw, 50px);
+            height: clamp(18px, 6vw, 60px);
+            border: 1px solid transparent;
+            border-right: 0;
+            border-top: 0;
+            box-shadow: 0 0 0 1px;
+            border-radius: 1px;
+            border-top-right-radius: 4px;
+            overflow: hidden
+        }
+        .gg-file-add::after,
+        .gg-file-add::before {
+            content: "";
+            display: block;
+            box-sizing: border-box;
+            position: absolute;
+            height: 6px
+        }
+        .gg-file-add::before {
+            background: currentColor;
+            left: 4px;
+            width: 2px;
+            top: 7px
+        }
+        .gg-file-add::after {
+            width: 6px;
+            border-left: 1px solid;
+            border-bottom: 1px solid;
+            right: -1px;
+            top: -1px
+        }
+        a.btn-flat {
+        overflow: hidden;
+        padding: clamp(10px, 1.2vw, 20px) clamp(40px, 4.8vw, 80px);
+        color: #fff;
+        border-radius: 0;
+        background: #000;
+        }
+
+        a.btn-flat span {
+        position: relative;
+        }
+
+        a.btn-flat:before {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        content: '';
+        -webkit-transition: all .5s ease-in-out;
+        transition: all .5s ease-in-out;
+        -webkit-transform: translateX(-96%);
+        transform: translateX(-96%);
+        background: #eb6877;
+        }
+
+        a.btn-flat:hover:before {
+        -webkit-transform: translateX(0%);
+        transform: translateX(0%);
+        }
+    </style>
+    <script>
+    window.addEventListener( "DOMContentLoaded" , ()=> {
+
+        const ddarea = document.getElementById("ddarea");
+        const tarea = document.getElementById("txtarea");
+
+            // ドラッグされたデータが有効かどうかチェック
+        const isValid = e => e.dataTransfer.types.indexOf("Files") >= 0;
+
+        const ddEvent = {
+            "dragover" : e=>{
+                e.preventDefault(); // 既定の処理をさせない
+                e.stopPropagation(); // イベント伝播を止める
+                if( !e.target.isEqualNode( ddarea ) ) {
+                        // ドロップエリア外ならドロップを無効にする
+                    e.dataTransfer.dropEffect = "none";return;
+                }
+                // e.stopPropagation(); // イベント伝播を止める
+
+                if( !isValid(e) ){
+                        // 無効なデータがドラッグされたらドロップを無効にする
+                    e.dataTransfer.dropEffect = "none";return;
+                }
+                        // ドロップのタイプを変更
+                e.dataTransfer.dropEffect = "copy";
+                ddarea.classList.add("ddefect");
+            },
+            "dragleave" : e=>{
+                e.stopPropagation(); // イベント伝播を止める
+                if( !e.target.isEqualNode( ddarea ) ) {
+                    return;
+                }
+                // e.stopPropagation(); // イベント伝播を止める
+                ddarea.classList.remove("ddefect");
+            },
+            "drop":e=>{
+                e.preventDefault(); // 既定の処理をさせない
+                e.stopPropagation(); // イベント伝播を止める
+
+                const files = e.dataTransfer.files;
+
+                tarea.value += `${files.length}のファイルがドロップされた。`;
+                for( file of files )tarea.value +=  `name:${file.name} type:${file.type}`;
+
+                ddarea.classList.remove("ddefect");
+            }
+        };
+
+        Object.keys( ddEvent ).forEach( e=>{
+            // ddarea.addEventListener(e,ddEvent[e]);
+            document.body.addEventListener(e,ddEvent[e],true)
+        });
+
+        });
+    </script>
+</head>
+
+<header><p style="font-size: clamp(12px, 1.5vw, 40px);">送信フォーム</p></header>
+<body>
+    <div id="ddarea">
+        <p style="font-size: clamp(12px, 1.25vw, 40px);">ここにドロップ</p>
+        <i class="gg-file-add"></i>
+    </div>
+    <div class="txtareawrap">
+    <textarea id="txtarea"></textarea>
+    <a href="" class="btn btn-flat"><span>ファイルを送信</span></a>
+    </div>
+</body>
+<footer></footer>
+<script></script>
+</html>
